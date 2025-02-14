@@ -4,11 +4,28 @@ const effects = createEffectStack();
 const scheduler = createEffectScheduler();
 
 export type State<T> = {
+  /**
+   * Get the current value.
+   */
   get(): T;
+  /**
+   * Set a new value.
+   *
+   * Multiple calls to set are batched and only after the final value changed will the subscribers be called.
+   */
   set(value: T | ((prev: T) => T)): void;
+  /**
+   * Subscribe to changes.
+   *
+   * Subscribers may return a cleanup function that will be called before rerunning.
+   * Subscribers may also receive a signal to unsubscribe when the signal aborts.
+   */
   subscribe(fn: () => Unsub, options?: { signal?: AbortSignal }): () => void;
 };
 
+/**
+ * Creates a reactive value that can be retrived, updated and subscribed to.
+ */
 export function state<T>(initialValue: T): State<T> {
   let stateValue = initialValue;
   const subscribers = new Set<() => Unsub>();
@@ -45,12 +62,25 @@ export function state<T>(initialValue: T): State<T> {
 
 export type ComputedState<T> = Omit<State<T>, "set">;
 
+/**
+ * Creates a reactive value that can be retrieved and subscribed to.
+ *
+ * Computed automatically subscribes to reactive values that are used inside it
+ * and updates when any of it's dependencies updates.
+ */
 export function computed<U>(fn: () => U): ComputedState<U> {
   const { get, set, subscribe } = state<U>(null as U);
   effects.add({ fn: () => set(fn()) });
   return { get, subscribe };
 }
 
+/**
+ * Effect automatically subscribes to reactive values that are used inside it
+ * and reruns when any of it's dependencies updates.
+ *
+ * Effects may return a cleanup function that will be called before rerunning.
+ * Effects may also receive a signal to unsubscribe when the signal aborts.
+ */
 export function effect(fn: () => Unsub, options?: { signal?: AbortSignal }) {
   effects.add({ fn, options });
 }
@@ -114,6 +144,15 @@ export type Context = {
   load(): void;
 };
 
+/**
+ * Creates a block that can be loaded and unloaded.
+ *
+ * Context accepts a signal that is aborted when the context is unloaded.
+ * Context may return a cleanup function that will be called before rerunning.
+ *
+ * Context function runs immediately, if you prefer to run it manually then set lazy to true.
+ * Calling load on a context unloads the context (if already loaded) before rerunning.
+ */
 export function context(
   fn: (signal: AbortSignal) => Unsub,
   options?: { lazy?: boolean }
@@ -134,6 +173,9 @@ export function context(
   };
 }
 
+/**
+ * Returns the first element in document that matches selector.
+ */
 export function ref<E extends Element = Element>(selector: string) {
   return document.querySelector<E>(selector);
 }

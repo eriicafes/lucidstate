@@ -1,0 +1,5 @@
+---
+"lucidstate": minor
+---
+
+Define API

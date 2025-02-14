@@ -1,6 +1,6 @@
 # LucidState
 
-Simple and lightweight signals based reactive state management library for building applications with vanilla javascript and DOM APIs.
+💧 Simple and lightweight signals based reactive state management library for building applications with vanilla javascript and DOM APIs.
 
 ## Installation
 
@@ -47,7 +47,7 @@ count.get(); // 1
 
 ### Subscribing to changes
 
-Subscribers are called after a reactive value is changed to another value different from it's current value.
+Subscribers are called after a reactive value is changed.
 Multiple calls to set state are batched and only after the final value changed will the subscribers be called.
 
 Subscribers may return a cleanup function that will be called before rerunning.
@@ -158,7 +158,7 @@ registerEvents.unload(); // runs cleanup and aborts signal
 
 Context function runs immediately, if you prefer to run it manually then make the context lazy.
 
-Calling load on a context unloads the current context (if any) before rerunning.
+Calling load on a context unloads the context (if already loaded) before rerunning.
 
 ```ts
 import { context } from "lucidstate";
