@@ -111,7 +111,7 @@ function createEffectScheduler() {
 
 export type Context = {
   unload(): void;
-  reset(): void;
+  load(): void;
 };
 
 export function context(
@@ -122,14 +122,14 @@ export function context(
   let cb: Unsub;
   if (!options?.lazy) cb = fn(controller.signal);
   return {
-    unload() {
-      if (cb) cb();
-      controller.abort();
-    },
-    reset() {
+    load() {
       this.unload();
       controller = new AbortController();
       cb = fn(controller.signal);
+    },
+    unload() {
+      if (cb) cb();
+      controller.abort();
     },
   };
 }
