@@ -1,17 +1,17 @@
-# Domstate
+# LucidState
 
-📦 Signals based reactive state management library for building applications with vanilla javascript and DOM APIs.
+Simple and lightweight signals based reactive state management library for building applications with vanilla javascript and DOM APIs.
 
 ## Installation
 
 ```sh
-npm i domstate
+npm i lucidstate
 ```
 
 ## Usage
 
 ```ts
-import { computed, effect, state } from "domstate";
+import { computed, effect, state } from "lucidstate";
 
 const count = state(0);
 const countString = computed(() => `${count.get()}`);
@@ -34,7 +34,7 @@ effect(() => {
 `state` creates a reactive value that can be retrived, updated and subscribed to.
 
 ```ts
-import { state } from "domstate";
+import { state } from "lucidstate";
 
 const count = state(0);
 
@@ -55,7 +55,7 @@ Subscribers may return a cleanup function that will be called before rerunning.
 Subscribers may also receive a signal to unsubscribe when the signal aborts.
 
 ```ts
-import { state } from "domstate";
+import { state } from "lucidstate";
 
 const count = state(0);
 const controller = new AbortController();
@@ -95,7 +95,7 @@ const update3 = () => {
 `computed` automatically subscribes to reactive values that are used inside it and updates when any of it's dependencies updates.
 
 ```ts
-import { computed, state } from "domstate";
+import { computed, state } from "lucidstate";
 
 const count = state(0);
 const countString = computed(() => `${count.get()}`);
@@ -115,7 +115,7 @@ Effects may return a cleanup function that will be called before rerunning.
 Effects may also receive a signal to unsubscribe when the signal aborts.
 
 ```ts
-import { effect, state } from "domstate";
+import { effect, state } from "lucidstate";
 
 const count = state(0);
 const count2 = state(100);
@@ -137,7 +137,7 @@ effect(
 A context may return a cleanup function that will be called before rerunning.
 
 ```ts
-import { context } from "domstate";
+import { context } from "lucidstate";
 
 const registerEvents = context((signal) => {
   console.log("registering events");
@@ -161,7 +161,7 @@ Context function runs immediately, if you prefer to run it manually then make th
 Calling load on a context unloads the current context (if any) before rerunning.
 
 ```ts
-import { context } from "domstate";
+import { context } from "lucidstate";
 
 const registerEvents = context(
   (signal) => {
