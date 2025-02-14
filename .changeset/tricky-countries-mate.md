@@ -1,5 +1,0 @@
----
-"lucidstate": major
----
-
-Define API
