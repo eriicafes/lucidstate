@@ -1,5 +1,5 @@
 ---
-"lucidstate": minor
+"lucidstate": major
 ---
 
 Define API
