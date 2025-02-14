@@ -27,6 +27,10 @@
   ],
   "author": "Eric Afes <eriicafes@gmail.com>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eriicafes/lucidstate.git"
+  },
   "devDependencies": {
     "@changesets/cli": "^2.27.12",
     "shx": "^0.3.4",
