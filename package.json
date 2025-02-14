@@ -1,5 +1,5 @@
 {
-  "name": "reactive",
+  "name": "domstate",
   "version": "0.1.0",
   "description": "Signals based reactive state management for vanilla javascript",
   "private": false,
