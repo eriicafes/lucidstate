@@ -1,6 +1,6 @@
 {
   "name": "lucidstate",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Signals based reactive state management for vanilla javascript",
   "private": false,
   "main": "./dist/index.js",
