@@ -1,4 +1,4 @@
-type Unsub = void | (() => void);
+type Cleanup = void | (() => void);
 
 const effects = createEffectStack();
 const scheduler = createEffectScheduler();
@@ -20,7 +20,7 @@ export type State<T> = {
    * Subscribers may return a cleanup function that will be called before rerunning.
    * Subscribers may also receive a signal to unsubscribe when the signal aborts.
    */
-  subscribe(fn: () => Unsub, options?: { signal?: AbortSignal }): () => void;
+  subscribe(fn: () => Cleanup, options?: { signal?: AbortSignal }): () => void;
 };
 
 /**
@@ -28,7 +28,7 @@ export type State<T> = {
  */
 export function state<T>(initialValue: T): State<T> {
   let stateValue = initialValue;
-  const subscribers = new Set<() => Unsub>();
+  const subscribers = new Set<() => Cleanup>();
 
   return {
     get() {
@@ -81,16 +81,17 @@ export function computed<U>(fn: () => U): ComputedState<U> {
  * Effects may return a cleanup function that will be called before rerunning.
  * Effects may also receive a signal to unsubscribe when the signal aborts.
  */
-export function effect(fn: () => Unsub, options?: { signal?: AbortSignal }) {
+export function effect(fn: () => Cleanup, options?: { signal?: AbortSignal }) {
   effects.add({ fn, options });
 }
 
 const unsubSymbol = Symbol("unsub");
-const getUnsub = (target: any) => target[unsubSymbol] as Unsub | undefined;
-const setUnsub = (target: any, value: Unsub) => (target[unsubSymbol] = value);
+const getCleanup = (target: any) => target[unsubSymbol] as Cleanup | undefined;
+const setCleanup = (target: any, value: Cleanup) =>
+  (target[unsubSymbol] = value);
 
 type Effect = {
-  fn: () => Unsub;
+  fn: () => Cleanup;
   options?: { signal?: AbortSignal };
 };
 function createEffectStack() {
@@ -98,7 +99,7 @@ function createEffectStack() {
   return {
     add(effect: Effect) {
       stack.push(effect);
-      setUnsub(effect.fn, effect.fn());
+      setCleanup(effect.fn, effect.fn());
       stack.pop();
     },
     current() {
@@ -109,9 +110,9 @@ function createEffectStack() {
 
 type Deps = Map<State<any>, { snapshot: any; update: any }>;
 function createEffectScheduler() {
-  const executions = new Map<() => Unsub, Deps>();
+  const executions = new Map<() => Cleanup, Deps>();
   return {
-    queue<T>(fn: () => Unsub, state: State<T>, snapshot: T, update: T) {
+    queue<T>(fn: () => Cleanup, state: State<T>, snapshot: T, update: T) {
       const deps: Deps = executions.get(fn) ?? new Map();
       // if execution exists delete and re-add so it executes later than it was initially queued for
       executions.delete(fn);
@@ -127,8 +128,8 @@ function createEffectScheduler() {
           for (const [_, dep] of deps) {
             // execute and break out of loop if any deps have updated
             if (dep.snapshot !== dep.update) {
-              getUnsub(fn)?.();
-              setUnsub(fn, fn());
+              getCleanup(fn)?.();
+              setCleanup(fn, fn());
               break;
             }
           }
@@ -154,11 +155,11 @@ export type Context = {
  * Calling load on a context unloads the context (if already loaded) before rerunning.
  */
 export function context(
-  fn: (signal: AbortSignal) => Unsub,
+  fn: (signal: AbortSignal) => Cleanup,
   options?: { lazy?: boolean }
 ): Context {
   let controller = new AbortController();
-  let cb: Unsub;
+  let cb: Cleanup;
   if (!options?.lazy) cb = fn(controller.signal);
   return {
     load() {
